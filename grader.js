@@ -39,14 +39,12 @@ var assertFileExists = function(infile) {
 };
 
 var checkURL= function(url, checksfile) {
-    console.log("in checkURL, URL: " + url +  " checks: " + checksfile);
     rest.get(url).on('complete', function(result) {
 	if (result instanceof Error) {
 	    sys.puts('Error: ' + result.message);
 	    process.exit(1); 
 	} else {
 	    var html = cheerio.load(result);
-	    console.log("result: " + JSON.stringify(result));
 	    var checkJson = checkHtml(html, checksfile);
 	    var outJson = JSON.stringify(checkJson, null, 4);
 	    console.log(outJson);
@@ -84,21 +82,14 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
-var htmlFromURL = function(url) {
-    return '["h1", ".navigation"]';
-}
-
 if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
 	.option('-url, --url to <value>', 'URL to index.html')
         .parse(process.argv);
-
     if (program.url.length > 0 ) {
-	console.log(program.url);
 	checkURL(program.url, program.checks);
-	console.log("program.file: ", program.file);
     } else {
 	var checkJson = checkHtmlFile(program.file, program.checks);
 	var outJson = JSON.stringify(checkJson, null, 4);
